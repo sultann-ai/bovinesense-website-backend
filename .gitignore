@@ -1,0 +1,22 @@
+//write .gitignore for a Node.js project
+# Node.js dependencies
+/node_modules/
+# Environment variables
+.env
+# Logs
+/logs
+# Temporary files
+/tmp
+# Build output
+/dist
+# Coverage reports
+/coverage
+# IDE specific files
+/.vscode/
+# OS generated files
+.DS_Store
+# Ignore specific files
+# Ignore package-lock.json if you want to use yarn
+/package-lock.json
+# Ignore specific directories
+/public/uploads/
