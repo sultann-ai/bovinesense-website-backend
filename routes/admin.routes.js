@@ -16,7 +16,6 @@ router.post('/login', adminLogin);
 router.use(verifyToken); // Apply authentication middleware to all routes below
 
 router.get('/profile', getAdminProfile);
-router.get('/me', getAdminProfile); // Alias for /profile - more intuitive for auth checks
 router.post('/logout', adminLogout);
 router.put('/change-password', changePassword);
 
