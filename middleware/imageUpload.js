@@ -30,17 +30,34 @@ const uploadToCloudinary = async (req, res, next) => {
       return next();
     }
 
-    // Convert buffer to base64
-    const b64 = Buffer.from(req.file.buffer).toString('base64');
-    const dataURI = `data:${req.file.mimetype};base64,${b64}`;
+    console.log('Cloudinary config check:', {
+      cloud_name: cloudinary.config().cloud_name,
+      api_key: cloudinary.config().api_key,
+      api_secret: cloudinary.config().api_secret ? 'exists' : 'missing'
+    });
 
-    // Upload to Cloudinary
-    const result = await cloudinary.uploader.upload(dataURI, {
-      folder: 'zyninlabs',
-      transformation: [
-        { width: 1200, height: 800, crop: 'limit' },
-        { quality: 'auto' }
-      ]
+    // Upload directly from buffer without base64 conversion
+    const uploadOptions = {
+      upload_preset: 'zynin_unsigned', // Your custom unsigned preset
+      unsigned: true
+    };
+
+    console.log('Upload options:', uploadOptions);
+
+    // Upload using buffer stream
+    const result = await new Promise((resolve, reject) => {
+      cloudinary.uploader.upload_stream(
+        uploadOptions,
+        (error, result) => {
+          if (error) {
+            console.error('Cloudinary stream error:', error);
+            reject(error);
+          } else {
+            console.log('Cloudinary upload success:', result.public_id);
+            resolve(result);
+          }
+        }
+      ).end(req.file.buffer);
     });
 
     // Attach the Cloudinary result to the request object
@@ -51,6 +68,7 @@ const uploadToCloudinary = async (req, res, next) => {
 
     next();
   } catch (error) {
+    console.error('Cloudinary upload error:', error);
     return res.status(500).json({ 
       success: false, 
       message: 'Image upload failed', 
@@ -79,21 +97,26 @@ export const handleMultipleImageUpload = (fieldName = 'images', maxCount = 5) =>
         }
 
         const uploadPromises = req.files.map(async (file) => {
-          const b64 = Buffer.from(file.buffer).toString('base64');
-          const dataURI = `data:${file.mimetype};base64,${b64}`;
-
-          const result = await cloudinary.uploader.upload(dataURI, {
-            folder: 'zyninlabs',
-            transformation: [
-              { width: 1200, height: 800, crop: 'limit' },
-              { quality: 'auto' }
-            ]
-          });
-
-          return {
-            url: result.secure_url,
-            publicId: result.public_id
+          const uploadOptions = {
+            upload_preset: 'zynin_unsigned',
+            unsigned: true
           };
+
+          return new Promise((resolve, reject) => {
+            cloudinary.uploader.upload_stream(
+              uploadOptions,
+              (error, result) => {
+                if (error) {
+                  reject(error);
+                } else {
+                  resolve({
+                    url: result.secure_url,
+                    publicId: result.public_id
+                  });
+                }
+              }
+            ).end(file.buffer);
+          });
         });
 
         const cloudinaryResults = await Promise.all(uploadPromises);
@@ -101,6 +124,7 @@ export const handleMultipleImageUpload = (fieldName = 'images', maxCount = 5) =>
 
         next();
       } catch (error) {
+        console.error('Multiple images upload error:', error);
         return res.status(500).json({ 
           success: false, 
           message: 'Multiple images upload failed', 
@@ -120,18 +144,26 @@ export const handleMixedImageUpload = () => {
     ]),
     async (req, res, next) => {
       try {
+        const uploadOptions = {
+          upload_preset: 'zynin_unsigned',
+          unsigned: true
+        };
+
         // Handle single banner image
         if (req.files['image'] && req.files['image'][0]) {
           const file = req.files['image'][0];
-          const b64 = Buffer.from(file.buffer).toString('base64');
-          const dataURI = `data:${file.mimetype};base64,${b64}`;
-
-          const result = await cloudinary.uploader.upload(dataURI, {
-            folder: 'zyninlabs',
-            transformation: [
-              { width: 1200, height: 800, crop: 'limit' },
-              { quality: 'auto' }
-            ]
+          
+          const result = await new Promise((resolve, reject) => {
+            cloudinary.uploader.upload_stream(
+              uploadOptions,
+              (error, result) => {
+                if (error) {
+                  reject(error);
+                } else {
+                  resolve(result);
+                }
+              }
+            ).end(file.buffer);
           });
 
           req.cloudinaryResult = {
@@ -143,21 +175,21 @@ export const handleMixedImageUpload = () => {
         // Handle multiple screenshots
         if (req.files['screenshots'] && req.files['screenshots'].length > 0) {
           const uploadPromises = req.files['screenshots'].map(async (file) => {
-            const b64 = Buffer.from(file.buffer).toString('base64');
-            const dataURI = `data:${file.mimetype};base64,${b64}`;
-
-            const result = await cloudinary.uploader.upload(dataURI, {
-              folder: 'zyninlabs',
-              transformation: [
-                { width: 1200, height: 800, crop: 'limit' },
-                { quality: 'auto' }
-              ]
+            return new Promise((resolve, reject) => {
+              cloudinary.uploader.upload_stream(
+                uploadOptions,
+                (error, result) => {
+                  if (error) {
+                    reject(error);
+                  } else {
+                    resolve({
+                      url: result.secure_url,
+                      publicId: result.public_id
+                    });
+                  }
+                }
+              ).end(file.buffer);
             });
-
-            return {
-              url: result.secure_url,
-              publicId: result.public_id
-            };
           });
 
           const cloudinaryResults = await Promise.all(uploadPromises);
@@ -166,6 +198,7 @@ export const handleMixedImageUpload = () => {
 
         next();
       } catch (error) {
+        console.error('Mixed images upload error:', error);
         return res.status(500).json({ 
           success: false, 
           message: 'Mixed images upload failed', 
