@@ -1,4 +1,5 @@
 import express from 'express';
+import { handleImageUpload } from '../middleware/imageUpload.js';
 import {
   getAllPartners,
   createPartner,
@@ -12,10 +13,10 @@ const router = express.Router();
 router.get('/', getAllPartners);
 
 // Create partner
-router.post('/', createPartner);
+router.post('/', handleImageUpload('image'), createPartner);
 
 // Update partner
-router.put('/:id', updatePartner);
+router.put('/:id', handleImageUpload('image'), updatePartner);
 
 // Delete partner
 router.delete('/:id', deletePartner);

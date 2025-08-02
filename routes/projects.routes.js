@@ -1,4 +1,5 @@
 import express from 'express';
+import { handleImageUpload } from '../middleware/imageUpload.js';
 import {
   getAllProjects,
   getProjectById,
@@ -16,10 +17,10 @@ router.get('/', getAllProjects);
 router.get('/:id', getProjectById);
 
 // Create project
-router.post('/', createProject);
+router.post('/', handleImageUpload('image'), createProject);
 
 // Update project
-router.put('/:id', updateProject);
+router.put('/:id', handleImageUpload('image'), updateProject);
 
 // Delete project
 router.delete('/:id', deleteProject);

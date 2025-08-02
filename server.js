@@ -14,7 +14,6 @@ import productsRoutes from './routes/products.routes.js';
 import blogRoutes from './routes/blog.routes.js';
 import contactRoutes from './routes/contact.routes.js';
 import adminRoutes from './routes/admin.routes.js';
-import uploadRoutes from './routes/upload.routes.js';
 
 dotenv.config();
 
@@ -54,7 +53,6 @@ app.use('/api/products', productsRoutes);
 app.use('/api/blog', blogRoutes);
 app.use('/api/contact', contactRoutes);
 app.use('/api/admin', adminRoutes);
-app.use('/api/upload', uploadRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {

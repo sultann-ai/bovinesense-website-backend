@@ -1,4 +1,5 @@
 import express from 'express';
+import { handleImageUpload } from '../middleware/imageUpload.js';
 import {
   getAllFounders,
   getFounderById,
@@ -16,10 +17,10 @@ router.get('/', getAllFounders);
 router.get('/:id', getFounderById);
 
 // Create founder
-router.post('/', createFounder);
+router.post('/', handleImageUpload('image'), createFounder);
 
 // Update founder
-router.put('/:id', updateFounder);
+router.put('/:id', handleImageUpload('image'), updateFounder);
 
 // Delete founder
 router.delete('/:id', deleteFounder);

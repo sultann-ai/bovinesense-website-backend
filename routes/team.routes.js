@@ -1,4 +1,5 @@
 import express from 'express';
+import { handleImageUpload } from '../middleware/imageUpload.js';
 import {
   getAllTeamMembers,
   getTeamMemberById,
@@ -16,10 +17,10 @@ router.get('/', getAllTeamMembers);
 router.get('/:id', getTeamMemberById);
 
 // Create team member
-router.post('/', createTeamMember);
+router.post('/', handleImageUpload('image'), createTeamMember);
 
 // Update team member
-router.put('/:id', updateTeamMember);
+router.put('/:id', handleImageUpload('image'), updateTeamMember);
 
 // Delete team member
 router.delete('/:id', deleteTeamMember);

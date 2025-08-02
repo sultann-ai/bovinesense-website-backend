@@ -1,4 +1,5 @@
 import express from 'express';
+import { handleImageUpload } from '../middleware/imageUpload.js';
 import {
   getAllBlogPosts,
   getBlogPostById,
@@ -23,10 +24,10 @@ router.get('/slug/:slug', getBlogPostBySlug);
 
 // Protected routes (authentication required)
 // Create blog post
-router.post('/', verifyToken, createBlogPost);
+router.post('/', verifyToken, handleImageUpload('coverImage'), createBlogPost);
 
 // Update blog post
-router.put('/:id', verifyToken, updateBlogPost);
+router.put('/:id', verifyToken, handleImageUpload('coverImage'), updateBlogPost);
 
 // Delete blog post
 router.delete('/:id', verifyToken, deleteBlogPost);

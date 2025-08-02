@@ -1,4 +1,5 @@
 import BlogPost from '../models/BlogPost.js';
+import { deleteFromCloudinary } from '../middleware/imageUpload.js';
 
 // Get all blog posts
 export const getAllBlogPosts = async (req, res) => {
@@ -39,7 +40,14 @@ export const getBlogPostBySlug = async (req, res) => {
 // Create blog post
 export const createBlogPost = async (req, res) => {
   try {
-    const blogPost = new BlogPost(req.body);
+    const blogPostData = { ...req.body };
+    
+    // If cover image was uploaded, add the Cloudinary URL to the data
+    if (req.cloudinaryResult) {
+      blogPostData.coverImage = req.cloudinaryResult.url;
+    }
+    
+    const blogPost = new BlogPost(blogPostData);
     const savedBlogPost = await blogPost.save();
     res.status(201).json(savedBlogPost);
   } catch (error) {
@@ -50,9 +58,16 @@ export const createBlogPost = async (req, res) => {
 // Update blog post
 export const updateBlogPost = async (req, res) => {
   try {
+    const blogPostData = { ...req.body };
+    
+    // If cover image was uploaded, add the Cloudinary URL to the data
+    if (req.cloudinaryResult) {
+      blogPostData.coverImage = req.cloudinaryResult.url;
+    }
+    
     const blogPost = await BlogPost.findByIdAndUpdate(
       req.params.id,
-      req.body,
+      blogPostData,
       { new: true, runValidators: true }
     );
     if (!blogPost) {
@@ -67,10 +82,26 @@ export const updateBlogPost = async (req, res) => {
 // Delete blog post
 export const deleteBlogPost = async (req, res) => {
   try {
-    const blogPost = await BlogPost.findByIdAndDelete(req.params.id);
+    const blogPost = await BlogPost.findById(req.params.id);
     if (!blogPost) {
       return res.status(404).json({ message: 'Blog post not found' });
     }
+    
+    // If blog post has a cover image, extract public ID and delete from Cloudinary
+    if (blogPost.coverImage) {
+      try {
+        // Extract public ID from Cloudinary URL
+        const urlParts = blogPost.coverImage.split('/');
+        const publicIdWithExt = urlParts[urlParts.length - 1];
+        const publicId = `zyninlabs/${publicIdWithExt.split('.')[0]}`;
+        await deleteFromCloudinary(publicId);
+      } catch (cloudinaryError) {
+        console.error('Error deleting image from Cloudinary:', cloudinaryError);
+        // Continue with deletion even if Cloudinary deletion fails
+      }
+    }
+    
+    await BlogPost.findByIdAndDelete(req.params.id);
     res.json({ message: 'Blog post deleted successfully' });
   } catch (error) {
     res.status(500).json({ message: error.message });
