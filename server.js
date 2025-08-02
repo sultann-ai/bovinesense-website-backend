@@ -27,8 +27,22 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
+// CORS configuration with whitelisted URLs
+const corsOptions = {
+  origin: [
+    'http://localhost:5173',
+    'http://localhost:5174',
+    'https://zyninlabs.com',
+    'https://www.zyninlabs.com',
+    'https://zyninlabs.vercel.app',
+    'https://www.zyninlabs.vercel.app',
+  ],
+  credentials: true,
+  optionsSuccessStatus: 200
+};
+
 // Middleware
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
