@@ -62,6 +62,7 @@ export const createProduct = async (req, res) => {
 
 // Update product
 export const updateProduct = async (req, res) => {
+  console.log('hello from updateProduct');
   try {
     const product = await Product.findById(req.params.id);
     if (!product) {
@@ -88,9 +89,10 @@ export const updateProduct = async (req, res) => {
       productData,
       { new: true, runValidators: true }
     );
-    
+    console.log('Updated product:', updatedProduct);
     res.json(updatedProduct);
   } catch (error) {
+    console.error('Error updating product:', error);
     res.status(400).json({ message: error.message });
   }
 };
