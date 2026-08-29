@@ -55,10 +55,40 @@ app.use((req, res, next) => {
   next();
 });
 
-// MongoDB connection
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/bovinesense')
-  .then(() => console.log('Connected to MongoDB'))
-  .catch(err => console.error('MongoDB connection error:', err));
+// MongoDB Serverless Connection Caching
+let cached = global.mongoose;
+if (!cached) {
+  cached = global.mongoose = { conn: null, promise: null };
+}
+
+async function dbConnect() {
+  if (cached.conn) {
+    return cached.conn;
+  }
+  if (!cached.promise) {
+    const opts = {
+      bufferCommands: false,
+      serverSelectionTimeoutMS: 5000,
+    };
+    cached.promise = mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/bovinesense', opts).then((mongoose) => {
+      console.log('Connected to MongoDB');
+      return mongoose;
+    });
+  }
+  cached.conn = await cached.promise;
+  return cached.conn;
+}
+
+// Middleware to ensure DB connection before hitting routes
+app.use(async (req, res, next) => {
+  try {
+    await dbConnect();
+    next();
+  } catch (error) {
+    console.error('MongoDB connection error:', error);
+    res.status(500).json({ error: 'Database connection failed' });
+  }
+});
 
 // Routes
 app.use('/api/founders', foundersRoutes);
@@ -77,6 +107,12 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', message: 'Server is running' });
 });
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+// ONLY listen on a port if running locally
+if (process.env.NODE_ENV !== 'production') {
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
+}
+
+// EXPORT the app for Vercel serverless to consume
+export default app;
