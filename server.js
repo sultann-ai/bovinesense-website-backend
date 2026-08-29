@@ -14,6 +14,7 @@ import productsRoutes from './routes/products.routes.js';
 import blogRoutes from './routes/blog.routes.js';
 import contactRoutes from './routes/contact.routes.js';
 import adminRoutes from './routes/admin.routes.js';
+import recognitionsRoutes from './routes/recognitions.routes.js';
 
 dotenv.config();
 
@@ -32,10 +33,10 @@ const corsOptions = {
   origin: [
     'http://localhost:5173',
     'http://localhost:5174',
-    'https://zyninlabs.com',
-    'https://www.zyninlabs.com',
-    'https://zyninlabs.vercel.app',
-    'https://www.zyninlabs.vercel.app',
+    'https://bovinesense.com',
+    'https://www.bovinesense.com',
+    'https://bovinesense.vercel.app',
+    'https://www.bovinesense.vercel.app',
   ],
   credentials: true,
   optionsSuccessStatus: 200
@@ -53,7 +54,7 @@ app.use((req, res, next) => {
 });
 
 // MongoDB connection
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/zyninlabs')
+mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/bovinesense')
   .then(() => console.log('Connected to MongoDB'))
   .catch(err => console.error('MongoDB connection error:', err));
 
@@ -67,6 +68,7 @@ app.use('/api/products', productsRoutes);
 app.use('/api/blog', blogRoutes);
 app.use('/api/contact', contactRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/recognitions', recognitionsRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {

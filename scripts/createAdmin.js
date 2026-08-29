@@ -8,7 +8,7 @@ dotenv.config();
 const createInitialAdmin = async () => {
   try {
     // Connect to MongoDB
-    await mongoose.connect(process.env.MONGODB_URI);
+    await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/bovinesense');
     console.log('Connected to MongoDB');
 
     // Check if admin already exists
@@ -21,7 +21,7 @@ const createInitialAdmin = async () => {
     // Create initial admin user
     const admin = new Admin({
       username: 'admin',
-      email: 'admin@zyninlabs.com',
+      email: 'admin@bovinesense.com',
       password: process.env.INITIAL_ADMIN_PASSWORD || 'admin123',
       role: 'super-admin'
     });

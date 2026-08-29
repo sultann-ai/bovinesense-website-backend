@@ -22,6 +22,19 @@ const upload = multer({
   fileFilter: fileFilter
 });
 
+const handleUploadErrors = (uploadMiddleware) => (req, res, next) => {
+  uploadMiddleware(req, res, (error) => {
+    if (error) {
+      const status = error.code === 'LIMIT_FILE_SIZE' ? 413 : 400;
+      return res.status(status).json({
+        success: false,
+        message: error.message || 'Invalid image upload'
+      });
+    }
+    next();
+  });
+};
+
 // Middleware to upload image to Cloudinary
 const uploadToCloudinary = async (req, res, next) => {
   try {
@@ -36,10 +49,18 @@ const uploadToCloudinary = async (req, res, next) => {
       api_secret: cloudinary.config().api_secret ? 'exists' : 'missing'
     });
 
-    // Upload directly from buffer without base64 conversion
+    const { cloud_name: cloudName, api_key: apiKey, api_secret: apiSecret } = cloudinary.config();
+    if (!cloudName || !apiKey || !apiSecret) {
+      return res.status(503).json({
+        success: false,
+        message: 'Image uploads are not configured. Add Cloudinary credentials to the backend .env file.'
+      });
+    }
+
+    // Use the configured API credentials so uploads do not depend on an
+    // unsigned upload preset existing in the Cloudinary account.
     const uploadOptions = {
-      upload_preset: 'zynin_unsigned', // Your custom unsigned preset
-      unsigned: true
+      folder: 'bovinesense'
     };
 
     console.log('Upload options:', uploadOptions);
@@ -80,7 +101,7 @@ const uploadToCloudinary = async (req, res, next) => {
 // Helper function to handle single image upload
 export const handleImageUpload = (fieldName = 'image') => {
   return [
-    upload.single(fieldName),
+    handleUploadErrors(upload.single(fieldName)),
     uploadToCloudinary
   ];
 };
@@ -97,10 +118,7 @@ export const handleMultipleImageUpload = (fieldName = 'images', maxCount = 5) =>
         }
 
         const uploadPromises = req.files.map(async (file) => {
-          const uploadOptions = {
-            upload_preset: 'zynin_unsigned',
-            unsigned: true
-          };
+          const uploadOptions = { folder: 'bovinesense' };
 
           return new Promise((resolve, reject) => {
             cloudinary.uploader.upload_stream(
@@ -144,10 +162,7 @@ export const handleMixedImageUpload = () => {
     ]),
     async (req, res, next) => {
       try {
-        const uploadOptions = {
-          upload_preset: 'zynin_unsigned',
-          unsigned: true
-        };
+        const uploadOptions = { folder: 'bovinesense' };
 
         // Handle single banner image
         if (req.files['image'] && req.files['image'][0]) {

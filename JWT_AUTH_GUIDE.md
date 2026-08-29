@@ -69,7 +69,7 @@ Content-Type: application/json
   "admin": {
     "id": "65f1a2b3c4d5e6f7g8h9i0j1",
     "username": "admin",
-    "email": "admin@zyninlabs.com",
+    "email": "admin@bovinesense.com",
     "role": "super-admin",
     "lastLogin": "2025-08-01T10:30:00.000Z"
   }
@@ -112,7 +112,7 @@ npm run create-admin
 
 This will create a super-admin user with:
 - Username: `admin`
-- Email: `admin@zyninlabs.com`
+- Email: `admin@bovinesense.com`
 - Password: Set via `INITIAL_ADMIN_PASSWORD` env variable or defaults to `admin123`
 
 ### 2. Security Considerations

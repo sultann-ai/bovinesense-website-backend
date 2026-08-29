@@ -111,7 +111,7 @@ export const deleteProduct = async (req, res) => {
         // Extract public ID from Cloudinary URL
         const urlParts = product.bannerImage.split('/');
         const publicIdWithExt = urlParts[urlParts.length - 1];
-        const publicId = `zyninlabs/${publicIdWithExt.split('.')[0]}`;
+        const publicId = `bovinesense/${publicIdWithExt.split('.')[0]}`;
         await deleteFromCloudinary(publicId);
       } catch (cloudinaryError) {
         console.error('Error deleting image from Cloudinary:', cloudinaryError);
@@ -193,7 +193,7 @@ export const removeProductScreenshot = async (req, res) => {
       if (removedUrl) {
         const urlParts = removedUrl.split('/');
         const publicIdWithExt = urlParts[urlParts.length - 1];
-        const publicId = `zyninlabs/${publicIdWithExt.split('.')[0]}`;
+        const publicId = `bovinesense/${publicIdWithExt.split('.')[0]}`;
         await deleteFromCloudinary(publicId);
       }
     } catch (cloudinaryError) {

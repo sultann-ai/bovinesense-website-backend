@@ -80,7 +80,7 @@ export const deleteTeamMember = async (req, res) => {
         // Extract public ID from Cloudinary URL
         const urlParts = teamMember.image.split('/');
         const publicIdWithExt = urlParts[urlParts.length - 1];
-        const publicId = `zyninlabs/${publicIdWithExt.split('.')[0]}`;
+        const publicId = `bovinesense/${publicIdWithExt.split('.')[0]}`;
         await deleteFromCloudinary(publicId);
       } catch (cloudinaryError) {
         console.error('Error deleting image from Cloudinary:', cloudinaryError);

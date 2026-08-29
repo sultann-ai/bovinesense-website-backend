@@ -137,7 +137,7 @@ The following entities have been updated to use the new image upload middleware:
 
 ### Cloudinary Settings
 The middleware uses the following Cloudinary configuration:
-- **Folder**: `zyninlabs`
+- **Folder**: `bovinesense`
 - **Transformation**: Limited to 1200x800px with auto quality
 - **Format**: Auto-optimized based on content
 

@@ -9,13 +9,14 @@ import Partner from '../models/Partner.js';
 import Project from '../models/Project.js';
 import Product from '../models/Product.js';
 import BlogPost from '../models/BlogPost.js';
+import Recognition from '../models/Recognition.js';
 
 dotenv.config();
 
 // Connect to MongoDB function
 async function connectToDatabase() {
   try {
-    await mongoose.connect(process.env.MONGODB_URI);
+    await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/bovinesense');
     console.log('Connected to MongoDB');
   } catch (err) {
     console.error('MongoDB connection error:', err);
@@ -32,7 +33,7 @@ const foundersData = [
     image: 'https://images.pexels.com/photos/2182970/pexels-photo-2182970.jpeg?auto=compress&cs=tinysrgb&w=400',
     linkedin: 'https://linkedin.com/in/mehdiali',
     twitter: 'https://twitter.com/mehdiali',
-    email: 'mehdi@zyninlabs.com'
+    email: 'mehdi@bovinesense.com'
   },
   {
     name: 'Sultan Mehmood',
@@ -41,7 +42,7 @@ const foundersData = [
     image: 'https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=400',
     linkedin: 'https://linkedin.com/in/sultanmehmood',
     twitter: 'https://twitter.com/sultanmehmood',
-    email: 'sultan@zyninlabs.com'
+    email: 'sultan@bovinesense.com'
   },
   {
     name: 'Zohaib Afzaal',
@@ -50,7 +51,7 @@ const foundersData = [
     image: 'https://images.pexels.com/photos/2182975/pexels-photo-2182975.jpeg?auto=compress&cs=tinysrgb&w=400',
     linkedin: 'https://linkedin.com/in/zohaibafzaal',
     twitter: 'https://twitter.com/zohaibafzaal',
-    email: 'zohaib@zyninlabs.com'
+    email: 'zohaib@bovinesense.com'
   }
 ];
 
@@ -61,7 +62,7 @@ const teamData = [
     bio: 'React specialist with 5+ years of experience building responsive web applications.',
     image: 'https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=400',
     linkedin: 'https://linkedin.com/in/sarahjohnson',
-    email: 'sarah@zyninlabs.com'
+    email: 'sarah@bovinesense.com'
   },
   {
     name: 'Ahmed Hassan',
@@ -69,7 +70,7 @@ const teamData = [
     bio: 'Machine learning expert specializing in computer vision and natural language processing.',
     image: 'https://images.pexels.com/photos/2182968/pexels-photo-2182968.jpeg?auto=compress&cs=tinysrgb&w=400',
     linkedin: 'https://linkedin.com/in/ahmedhassan',
-    email: 'ahmed@zyninlabs.com'
+    email: 'ahmed@bovinesense.com'
   },
   {
     name: 'Emily Chen',
@@ -77,7 +78,7 @@ const teamData = [
     bio: 'Creative designer focused on user-centered design and intuitive interfaces.',
     image: 'https://images.pexels.com/photos/1181686/pexels-photo-1181686.jpeg?auto=compress&cs=tinysrgb&w=400',
     linkedin: 'https://linkedin.com/in/emilychen',
-    email: 'emily@zyninlabs.com'
+    email: 'emily@bovinesense.com'
   }
 ];
 
@@ -264,6 +265,28 @@ const partnersData = [
   }
 ];
 
+const recognitionsData = [
+  {
+    name: 'Innovation Certification Council',
+    image: 'https://placehold.co/400x200/e8f1ff/17345a?text=Innovation+Council',
+    website: 'https://example.com',
+    section: 'trusted'
+  },
+  {
+    name: 'Global Agritech Alliance',
+    image: 'https://placehold.co/400x200/e8f1ff/17345a?text=Agritech+Alliance',
+    website: 'https://example.com',
+    section: 'trusted'
+  },
+  {
+    name: 'Sustainable Technology Forum',
+    image: 'https://placehold.co/400x200/e8f1ff/17345a?text=Technology+Forum',
+    website: 'https://example.com',
+    section: 'trusted'
+  }
+];
+
+
 const projectsData = [
   {
     title: "E-Commerce Platform",
@@ -410,7 +433,7 @@ const productsData = [
       'https://images.pexels.com/photos/3184300/pexels-photo-3184300.jpeg?auto=compress&cs=tinysrgb&w=600',
       'https://images.pexels.com/photos/3184301/pexels-photo-3184301.jpeg?auto=compress&cs=tinysrgb&w=600'
     ],
-    githubLink: 'https://github.com/zyninlabs/smartanalytics-pro',
+    githubLink: 'https://github.com/bovinesense/smartanalytics-pro',
     liveLink: 'https://smartanalytics-pro.com'
   },
   {
@@ -430,7 +453,7 @@ const productsData = [
       'https://images.pexels.com/photos/3184303/pexels-photo-3184303.jpeg?auto=compress&cs=tinysrgb&w=600',
       'https://images.pexels.com/photos/3184304/pexels-photo-3184304.jpeg?auto=compress&cs=tinysrgb&w=600'
     ],
-    githubLink: 'https://github.com/zyninlabs/codeflow-ide',
+    githubLink: 'https://github.com/bovinesense/codeflow-ide',
     liveLink: 'https://codeflow-ide.com'
   }
 ];
@@ -499,7 +522,8 @@ async function seedDatabase() {
       Partner.deleteMany({}),
       Project.deleteMany({}),
       Product.deleteMany({}),
-      BlogPost.deleteMany({})
+      BlogPost.deleteMany({}),
+      Recognition.deleteMany({})
     ]);
 
     // Insert new data
@@ -510,7 +534,8 @@ async function seedDatabase() {
       Partner.insertMany(partnersData),
       Project.insertMany(projectsData),
       Product.insertMany(productsData),
-      BlogPost.insertMany(blogPostsData)
+      BlogPost.insertMany(blogPostsData),
+      Recognition.insertMany(recognitionsData)
     ]);
 
     console.log('Database seeded successfully!');
