@@ -37,6 +37,8 @@ const corsOptions = {
     'https://www.bovinesense.com',
     'https://bovinesense.vercel.app',
     'https://www.bovinesense.vercel.app',
+    'https://bovinehq.com',
+    'https://www.bovinehq.com',
   ],
   credentials: true,
   optionsSuccessStatus: 200
